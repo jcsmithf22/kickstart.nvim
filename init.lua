@@ -237,7 +237,10 @@ do
   vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
 
   local edit_config_file = function(filename) return string.format('<Cmd>edit %s/%s<CR>', vim.fn.stdpath 'config', filename) end
-  vim.keymap.set('n', '<leader>ec', edit_config_file 'init.lua', { desc = 'Neovim config' })
+  vim.keymap.set('n', '<leader>ei', edit_config_file 'init.lua', { desc = 'Neovim init.lua' })
+  vim.keymap.set('n', '<leader>ec', string.format('<Cmd>Oil %s<CR>', vim.fn.stdpath 'config'), { desc = 'Neovim config directory' })
+
+  vim.keymap.set("n", "-", "<CMD>Oil<CR>", { desc = "Open parent directory" })
 
   -- NOTE: Some terminals have colliding keymaps or are not able to send distinct keycodes
   -- vim.keymap.set("n", "<C-S-h>", "<C-w>H", { desc = "Move window to the left" })
@@ -761,6 +764,7 @@ do
     -- But for many setups, the LSP (`ts_ls`) will work just fine
     -- ts_ls = {},
 
+    basedpyright = {},
     stylua = {}, -- Used to format Lua code
 
     -- Special Lua Config, as recommended by neovim help docs
@@ -860,6 +864,11 @@ do
       --
       -- You can use 'stop_after_first' to run the first available formatter from the list
       -- javascript = { "prettierd", "prettier", stop_after_first = true },
+      python = {
+        'ruff_fix',
+        'ruff_format',
+        'ruff_organize_imports',
+      },
     },
   }
 
@@ -1034,7 +1043,7 @@ do
   -- NOTE: You can add your own plugins, configuration, etc from `lua/custom/plugins/*.lua`
   --
   --  Uncomment the following line and add your plugins to `lua/custom/plugins/*.lua` to get going.
-  -- require 'custom.plugins'
+  require 'custom.plugins'
 end
 
 -- The line beneath this is called `modeline`. See `:help modeline`

@@ -99,7 +99,7 @@ do
   vim.g.maplocalleader = ' '
 
   -- Set to true if you have a Nerd Font installed and selected in the terminal
-  vim.g.have_nerd_font = false
+  vim.g.have_nerd_font = true
 
   -- [[ Setting options ]]
   --  See `:help vim.o`
@@ -172,6 +172,14 @@ do
   -- See `:help 'confirm'`
   vim.o.confirm = true
 
+  -- I can also set this in the after/ftplugin directory
+  vim.o.expandtab = true -- Convert tabs to spaces
+  vim.o.shiftwidth = 2 -- Use this number of spaces for indentation
+  vim.o.tabstop = 2 -- Show tab as this number of spaces
+
+  -- vim.o.smartindent   = true    -- Make indenting smart
+  vim.o.spelloptions = 'camel' -- Treat camelCase word parts as separate words
+
   -- [[ Basic Keymaps ]]
   --  See `:help vim.keymap.set()`
 
@@ -227,6 +235,9 @@ do
   vim.keymap.set('n', '<C-l>', '<C-w><C-l>', { desc = 'Move focus to the right window' })
   vim.keymap.set('n', '<C-j>', '<C-w><C-j>', { desc = 'Move focus to the lower window' })
   vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
+
+  local edit_config_file = function(filename) return string.format('<Cmd>edit %s/%s<CR>', vim.fn.stdpath 'config', filename) end
+  vim.keymap.set('n', '<leader>ec', edit_config_file 'init.lua', { desc = 'Neovim config' })
 
   -- NOTE: Some terminals have colliding keymaps or are not able to send distinct keycodes
   -- vim.keymap.set("n", "<C-S-h>", "<C-w>H", { desc = "Move window to the left" })
@@ -365,15 +376,19 @@ do
   -- Useful plugin to show you pending keybinds.
   vim.pack.add { gh 'folke/which-key.nvim' }
   require('which-key').setup {
+    preset = 'helix',
     -- Delay between pressing a key and opening which-key (milliseconds)
     delay = 0,
-    icons = { mappings = vim.g.have_nerd_font },
+    -- icons = { mappings = vim.g.have_nerd_font },
+    icons = { mappings = false },
     -- Document existing key chains
     spec = {
+      { '<leader>e', group = '[E]explore', mode = { 'n', 'v' } },
       { '<leader>s', group = '[S]earch', mode = { 'n', 'v' } },
       { '<leader>t', group = '[T]oggle' },
       { '<leader>h', group = 'Git [H]unk', mode = { 'n', 'v' } }, -- Enable gitsigns recommended keymaps first
       { 'gr', group = 'LSP Actions', mode = { 'n' } },
+      { 's', group = 'Surround', mode = { 'n' } },
     },
   }
 
@@ -383,18 +398,56 @@ do
   -- change the command under that to load whatever the name of that colorscheme is.
   --
   -- If you want to see what colorschemes are already installed, you can use `:Telescope colorscheme`.
-  vim.pack.add { gh 'folke/tokyonight.nvim' }
-  ---@diagnostic disable-next-line: missing-fields
-  require('tokyonight').setup {
-    styles = {
-      comments = { italic = false }, -- Disable italics in comments
-    },
-  }
+  -- vim.pack.add { gh 'folke/tokyonight.nvim' }
+  -- ---@diagnostic disable-next-line: missing-fields
+  -- require('tokyonight').setup {
+  --   styles = {
+  --     comments = { italic = false }, -- Disable italics in comments
+  --   },
+  -- }
 
   -- Load the colorscheme here.
   -- Like many other themes, this one has different styles, and you could load
   -- any other, such as 'tokyonight-storm', 'tokyonight-moon', or 'tokyonight-day'.
-  vim.cmd.colorscheme 'tokyonight-night'
+  -- vim.cmd.colorscheme 'tokyonight-night'
+
+  vim.pack.add { gh 'rebelot/kanagawa.nvim' }
+
+  require('kanagawa').setup {
+    -- colors = {
+    -- 	theme = {
+    -- 		all = {
+    -- 			ui = {
+    -- 				bg_gutter = "none",
+    -- 			},
+    -- 		},
+    -- 	},
+    -- },
+    overrides = function(colors)
+      local theme = colors.theme
+      local makeDiagnosticColor = function(color)
+        local c = require 'kanagawa.lib.color'
+        return { fg = color, bg = c(color):blend(theme.ui.bg, 0.95):to_hex() }
+      end
+
+      return {
+        Pmenu = { fg = theme.ui.shade0, bg = theme.ui.bg_p1 }, -- add `blend = vim.o.pumblend` to enable transparency
+        PmenuKind = { fg = theme.ui.shade0, bg = theme.ui.bg_p1 },
+        PmenuSel = { fg = 'NONE', bg = theme.ui.bg_p2 },
+        PmenuKindSel = { fg = 'NONE', bg = theme.ui.bg_p2 },
+        PmenuSbar = { bg = theme.ui.bg_m1 },
+        PmenuThumb = { bg = theme.ui.bg_p2 },
+
+        DiagnosticVirtualTextHint = makeDiagnosticColor(theme.diag.hint),
+        DiagnosticVirtualTextInfo = makeDiagnosticColor(theme.diag.info),
+        DiagnosticVirtualTextWarn = makeDiagnosticColor(theme.diag.warning),
+        DiagnosticVirtualTextError = makeDiagnosticColor(theme.diag.error),
+      }
+    end,
+  }
+
+  vim.o.background = 'dark'
+  vim.cmd 'color kanagawa'
 
   -- Highlight todo, notes, etc in comments
   vim.pack.add { gh 'folke/todo-comments.nvim' }
@@ -418,6 +471,14 @@ do
     },
     n_lines = 500,
   }
+
+  require('mini.misc').setup {}
+  -- Restore latest cursor position on file open
+  MiniMisc.setup_restore_cursor()
+
+  -- Synchronize terminal emulator background with Neovim's background to remove
+  -- possibly different color padding around Neovim instance
+  MiniMisc.setup_termbg_sync()
 
   -- Add/delete/replace surroundings (brackets, quotes, etc.)
   --
@@ -817,9 +878,9 @@ do
   -- `friendly-snippets` contains a variety of premade snippets.
   --    See the README about individual language/framework/plugin snippets:
   --    https://github.com/rafamadriz/friendly-snippets
-  --
-  -- vim.pack.add { gh 'rafamadriz/friendly-snippets' }
-  -- require('luasnip.loaders.from_vscode').lazy_load()
+
+  vim.pack.add { gh 'rafamadriz/friendly-snippets' }
+  require('luasnip.loaders.from_vscode').lazy_load()
 
   -- [[ Autocomplete Engine ]]
   vim.pack.add { { src = gh 'saghen/blink.cmp', version = vim.version.range '1.*' } }
@@ -963,7 +1024,7 @@ do
   -- require 'kickstart.plugins.debug'
   -- require 'kickstart.plugins.indent_line'
   -- require 'kickstart.plugins.lint'
-  -- require 'kickstart.plugins.autopairs'
+  require 'kickstart.plugins.autopairs'
   -- require 'kickstart.plugins.neo-tree'
   -- require 'kickstart.plugins.gitsigns' -- adds gitsigns recommended keymaps
 

@@ -381,6 +381,10 @@ do
     delay = 0,
     -- icons = { mappings = vim.g.have_nerd_font },
     icons = { mappings = false },
+    triggers = {
+      { '<auto>', mode = 'nixsotc' },
+      { 's', mode = { 'n', 'v' } },
+    },
     -- Document existing key chains
     spec = {
       { '<leader>e', group = '[E]explore', mode = { 'n', 'v' } },
@@ -388,7 +392,6 @@ do
       { '<leader>t', group = '[T]oggle' },
       { '<leader>h', group = 'Git [H]unk', mode = { 'n', 'v' } }, -- Enable gitsigns recommended keymaps first
       { 'gr', group = 'LSP Actions', mode = { 'n' } },
-      { 's', group = 'Surround', mode = { 'n' } },
     },
   }
 

@@ -238,9 +238,6 @@ do
 
   local edit_config_file = function(filename) return string.format('<Cmd>edit %s/%s<CR>', vim.fn.stdpath 'config', filename) end
   vim.keymap.set('n', '<leader>ei', edit_config_file 'init.lua', { desc = 'Neovim init.lua' })
-  vim.keymap.set('n', '<leader>ec', string.format('<Cmd>Oil %s<CR>', vim.fn.stdpath 'config'), { desc = 'Neovim config directory' })
-
-  vim.keymap.set("n", "-", "<CMD>Oil<CR>", { desc = "Open parent directory" })
 
   -- NOTE: Some terminals have colliding keymaps or are not able to send distinct keycodes
   -- vim.keymap.set("n", "<C-S-h>", "<C-w>H", { desc = "Move window to the left" })
@@ -479,6 +476,7 @@ do
   }
 
   require('mini.misc').setup {}
+
   -- Restore latest cursor position on file open
   MiniMisc.setup_restore_cursor()
 
@@ -592,16 +590,16 @@ do
       local buf = event.buf
 
       -- Find references for the word under your cursor.
-      vim.keymap.set('n', 'grr', builtin.lsp_references, { buffer = buf, desc = '[G]oto [R]eferences' })
+      vim.keymap.set('n', 'grr', builtin.lsp_references, { buffer = buf, desc = 'References' })
 
       -- Jump to the implementation of the word under your cursor.
       -- Useful when your language has ways of declaring types without an actual implementation.
-      vim.keymap.set('n', 'gri', builtin.lsp_implementations, { buffer = buf, desc = '[G]oto [I]mplementation' })
+      vim.keymap.set('n', 'gri', builtin.lsp_implementations, { buffer = buf, desc = 'Implementations' })
 
       -- Jump to the definition of the word under your cursor.
       -- This is where a variable was first declared, or where a function is defined, etc.
       -- To jump back, press <C-t>.
-      vim.keymap.set('n', 'grd', builtin.lsp_definitions, { buffer = buf, desc = '[G]oto [D]efinition' })
+      vim.keymap.set('n', 'grd', builtin.lsp_definitions, { buffer = buf, desc = 'Source definition' })
 
       -- Fuzzy find all the symbols in your current document.
       -- Symbols are things like variables, functions, types, etc.
@@ -614,7 +612,7 @@ do
       -- Jump to the type of the word under your cursor.
       -- Useful when you're not sure what type a variable is and you want to see
       -- the definition of its *type*, not where it was *defined*.
-      vim.keymap.set('n', 'grt', builtin.lsp_type_definitions, { buffer = buf, desc = '[G]oto [T]ype Definition' })
+      vim.keymap.set('n', 'grt', builtin.lsp_type_definitions, { buffer = buf, desc = 'Type definition' })
     end,
   })
 
@@ -699,15 +697,15 @@ do
 
       -- Rename the variable under your cursor.
       --  Most Language Servers support renaming across files, etc.
-      map('grn', vim.lsp.buf.rename, '[R]e[n]ame')
+      map('grn', vim.lsp.buf.rename, 'Rename')
 
       -- Execute a code action, usually your cursor needs to be on top of an error
       -- or a suggestion from your LSP for this to activate.
-      map('gra', vim.lsp.buf.code_action, '[G]oto Code [A]ction', { 'n', 'x' })
+      map('gra', vim.lsp.buf.code_action, 'Code actions', { 'n', 'x' })
 
       -- WARN: This is not Goto Definition, this is Goto Declaration.
       --  For example, in C this would take you to the header.
-      map('grD', vim.lsp.buf.declaration, '[G]oto [D]eclaration')
+      map('grD', vim.lsp.buf.declaration, 'Declaration')
 
       -- The following two autocommands are used to highlight references of the
       -- word under your cursor when your cursor rests there for a little while.

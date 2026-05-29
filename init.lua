@@ -763,6 +763,7 @@ do
     -- ts_ls = {},
 
     basedpyright = {},
+    ols = {},
     stylua = {}, -- Used to format Lua code
 
     -- Special Lua Config, as recommended by neovim help docs
